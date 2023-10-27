@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using VillaLand.Models;
 using VillaLand.Models.DataStore;
@@ -107,6 +108,21 @@ namespace Villa_Land_API.Controllers
             return NoContent();
         }
 
+        [HttpPatch("{id:int}", Name = "UpdatePartialVilla")]
+        public IActionResult PatchVilla(int id, [FromBody] JsonPatchDocument<VillaDTO> patchDTO)
+        {
+            if (patchDTO ==null || id == 0)
+            {
+                return BadRequest();
+            }
+            var villa = VillaStore.VillaList.FirstOrDefault(x=>x.Id == id);
+            patchDTO.ApplyTo(villa, ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            return NoContent();
 
+        }
     }
 }
